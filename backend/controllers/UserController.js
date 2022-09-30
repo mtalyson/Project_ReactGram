@@ -13,6 +13,12 @@ const generateToken = (id) => {
   })
 }
 
+// generating password hash
+const generatePasswordHash = async (password) => {
+  const salt = await bcrypt.genSalt()
+  return await bcrypt.hash(password, salt)
+}
+
 // user register controller
 const register = async (req, res) => {
   const { name, email, password } = req.body
@@ -26,8 +32,7 @@ const register = async (req, res) => {
   }
 
   // generate password hash
-  const salt = await bcrypt.genSalt()
-  const passwordHash = await bcrypt.hash(password, salt)
+  const passwordHash = await generatePasswordHash(password)
 
   // creating user on database
   const newUser = await User.create({
@@ -63,6 +68,7 @@ const login = async (req, res) => {
   // check if password matches
   if (!(await bcrypt.compare(password, user.password))) {
     res.status(422).json({ errors: ["Senha inválida."] })
+    return
   }
 
   // return user with token
@@ -98,9 +104,7 @@ const update = async (req, res) => {
   }
 
   if (password) {
-    const salt = await bcrypt.genSalt()
-    const passwordHash = await bcrypt.hash(password, salt)
-
+    const passwordHash = await generatePasswordHash(password)
     user.password = passwordHash
   }
 
