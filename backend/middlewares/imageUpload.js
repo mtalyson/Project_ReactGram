@@ -32,6 +32,6 @@ const imageUpload = multer({
   }
 })
 
-module.exports = { 
+module.exports = {
   imageUpload,
 }
