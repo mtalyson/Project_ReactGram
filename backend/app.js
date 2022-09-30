@@ -11,11 +11,20 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
+// config cors
+app.use(cors({credentials: true, origin: "http://localhost:3000"}))
+
+// config upload directory
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")))
+
+// config database connection
+require("./config/db.js")
+
 // routes
 const router = require("./routes/Router.js")
 app.use(router)
 
-// start
+// start app
 app.listen(port, () => {
   console.log(`App rodando na porta ${port}`)
 })
