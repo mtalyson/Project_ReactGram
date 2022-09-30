@@ -11,7 +11,7 @@ const generateToken = (id) => {
   })
 }
 
-// register user and log in
+// user register controller
 const register = async (req, res) => {
 
   const { name, email, password } = req.body
@@ -47,6 +47,12 @@ const register = async (req, res) => {
   })
 }
 
+// user login controller
+const login = (req, res) => {
+  res.send("Login")
+}
+
 module.exports = {
   register,
+  login,
 }
