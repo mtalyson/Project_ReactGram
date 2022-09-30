@@ -36,20 +36,41 @@ const register = async (req, res) => {
   })
 
   // check if user was created successfuly and return token
-  if(!newUser){
-    res.status(422).json({errors:["Houve um erro, por favor tente mais tarde."]})
+  if (!newUser) {
+    res.status(422).json({ errors: ["Houve um erro, por favor tente mais tarde."] })
     return
   }
 
   res.status(201).json({
     _id: newUser._id,
-    token: generateToken(newUser._id)
+    token: generateToken(newUser._id),
   })
 }
 
 // user login controller
-const login = (req, res) => {
-  res.send("Login")
+const login = async (req, res) => {
+
+  const { email, password } = req.body
+
+  // check if user exists
+  const user = await User.findOne({ email })
+
+  if (!user) {
+    res.status(404).json({ errors: ["Usuário não encontrado."] })
+    return
+  }
+
+  // check if password matches
+  if (!(await bcrypt.compare(password, user.password))) {
+    res.status(422).json({ errors: ["Senha inválida."] })
+  }
+
+  // return user with token
+  res.status(201).json({
+    _id: user._id,
+    profileImage: user.profileImage,
+    token: generateToken(user._id),
+  })
 }
 
 module.exports = {
