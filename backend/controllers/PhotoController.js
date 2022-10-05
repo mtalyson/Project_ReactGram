@@ -110,7 +110,7 @@ const updatePhoto = async (req, res) => {
   const { title } = req.body
 
   const reqUser = req.user
-  
+
   try {
     const photo = await Photo.findById(id)
 
@@ -142,14 +142,14 @@ const updatePhoto = async (req, res) => {
     })
     return
   }
-  
+
 }
 
 // photo like controller
 const likePhoto = async (req, res) => {
   const { id } = req.params
   const reqUser = req.user
-  
+
   try {
     const photo = await Photo.findById(id)
 
@@ -162,14 +162,14 @@ const likePhoto = async (req, res) => {
     }
 
     // check if user already liked the photo
-    if(photo.likes.includes(reqUser._id)) {
+    if (photo.likes.includes(reqUser._id)) {
       res.status(422).json({ errors: ["Você já curtiu a foto."] })
       return
     }
 
     // put user id in likes array
     photo.likes.push(reqUser._id)
-    photo.save()
+    await photo.save()
 
     res.status(200).json({ photoId: id, userUd: reqUser._id, message: "A foto foi curtida." })
   } catch (error) {
@@ -180,6 +180,46 @@ const likePhoto = async (req, res) => {
   }
 }
 
+// photo comment controller 
+const commentPhoto = async (req, res) => {
+  const { id } = req.params
+  const { comment } = req.body
+  const reqUser = req.user
+  
+  const user = await User.findById(reqUser._id)
+  
+  try {
+    const photo = await Photo.findById(id)
+
+    // check if photo exists
+    if (!photo) {
+      res.status(404).json({
+        errors: ["Foto não encontrada."],
+      })
+      return
+    }
+
+    // put comment in the array of comments
+    const userComment = {
+      comment,
+      userName: user.name,
+      userImage: user.profileImage,
+      userId: user._id
+    }
+
+    photo.comments.push(userComment)
+    await photo.save()
+
+    res.status(200).json({ comment: userComment, message: "O comentário foi adicionado com sucesso!" })
+  } catch (error) {
+    res.status(404).json({
+      errors: ["Foto não encontrada!"],
+    })
+    return
+  }
+ 
+}
+
 module.exports = {
   insertPhoto,
   deletePhoto,
@@ -188,4 +228,5 @@ module.exports = {
   getPhotoById,
   updatePhoto,
   likePhoto,
+  commentPhoto,
 }
