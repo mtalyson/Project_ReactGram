@@ -32,7 +32,7 @@ export const Login = () => {
   //clean all auth states
   useEffect(() => {
     dispath(reset())
-  }, dispath)
+  }, [dispath])
 
   return (
     <div id='login'>
