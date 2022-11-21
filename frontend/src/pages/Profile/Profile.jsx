@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom'
 
 //redux
 import { getUserDetails } from '../../slices/userSlice'
-import { publishPhoto, resetMessage } from '../../slices/photoSlice'
+import { publishPhoto, resetMessage, getUserPhotos } from '../../slices/photoSlice'
 
 export const Profile = () => {
   const { id } = useParams()
@@ -34,6 +34,7 @@ export const Profile = () => {
   //load user data
   useEffect(() => {
     dispatch(getUserDetails(id))
+    dispatch(getUserPhotos(id))
   }, [dispatch, id])
 
   const handleFile = (e) => {
@@ -51,7 +52,7 @@ export const Profile = () => {
 
     //build form data
     const formData = new FormData()
-    const photoFormData = Object.keys(photoData).forEach((key) => 
+    const photoFormData = Object.keys(photoData).forEach((key) =>
       formData.append(key, photoData[key])
     )
 
@@ -97,13 +98,45 @@ export const Profile = () => {
                 <input type="file" onChange={handleFile} />
               </label>
               {!loadingPhoto && <input type="submit" value="Postar" />}
-              {loadingPhoto &&  <input type="submit" value="Aguarde..." disabled />}
+              {loadingPhoto && <input type="submit" value="Aguarde..." disabled />}
             </form>
           </div>
           {errorPhoto && <Message msg={errorPhoto} type="error" />}
           {messagePhoto && <Message msg={messagePhoto} type="success" />}
         </>
       )}
+      <div className='user-photos'>
+        <h2>Fotos publicadas:</h2>
+        <div className='photos-container'>
+          {photos && photos.map((photo) => (
+            <div className='photo' key={photo._id}>
+              {photo.image && (
+                <img
+                  src={`${uploads}/photos/${photo.image}`}
+                  alt={photo.title}
+                />
+              )}
+              {id === userAuth._id
+                ? (
+                  <div className='actions'>
+                    <Link to={`/photos/${photo._id}`}>
+                      <BsFillEyeFill />
+                    </Link>
+                    <BsPencilFill />
+                    <BsXLg />
+                  </div>
+                )
+                : (
+                  <Link className="btn" to={`/photos/${photo._id}`}>
+                    Ver
+                  </Link>
+                )
+              }
+            </div>
+          ))}
+          {photos.length === 0 && <p>Ainda não há fotos publicadas</p>}
+        </div>
+      </div>
     </div>
   )
 }
