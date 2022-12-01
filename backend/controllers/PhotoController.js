@@ -171,7 +171,7 @@ const likePhoto = async (req, res) => {
     photo.likes.push(reqUser._id)
     await photo.save()
 
-    res.status(200).json({ photoId: id, userUd: reqUser._id, message: "A foto foi curtida." })
+    res.status(200).json({ photoId: id, userId: reqUser._id, message: "A foto foi curtida." })
   } catch (error) {
     res.status(404).json({
       errors: ["Foto não encontrada!"],
